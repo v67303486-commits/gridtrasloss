@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GridTrace TN — Offline Distribution Intelligence</title>
+<style>
+:root{--bg:#07100e;--panel:#0d1815;--panel2:#101e1a;--line:#23352e;--text:#edf6f1;--muted:#8fa39a;--cyan:#69ddd1;--yellow:#e8c75e;--red:#ef7777;--green:#69d7a4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 75% 5%,#17322b 0,#07100e 38%);color:var(--text);font:14px/1.5 Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.login{position:fixed;inset:0;background:#050b09;display:grid;place-items:center;z-index:9999;padding:20px}.loginbox{width:min(430px,100%);padding:32px;background:#0d1815;border:1px solid #294139;border-radius:20px;box-shadow:0 30px 90px #000}
+.brand{font-weight:900;font-size:24px;letter-spacing:.08em}.brand span{color:var(--cyan)}.login h1{font-size:24px;margin:22px 0 4px}.login p{color:var(--muted)}label{display:block;color:#a9b9b1;font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 7px}
+input,select{width:100%;padding:11px 12px;border-radius:9px;border:1px solid #2a4037;background:#08110f;color:var(--text);outline:none}input:focus,select:focus{border-color:var(--cyan)}
+.primary{width:100%;margin-top:18px;padding:12px;border:0;border-radius:9px;background:var(--cyan);color:#06110e;font-weight:800}.err{height:20px;color:#ff8c8c;margin-top:9px;font-size:12px}
+.top{position:sticky;top:0;z-index:20;background:rgba(7,16,14,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 22px;display:flex;align-items:center;gap:24px}.top nav{display:flex;gap:16px;flex:1}.top a{color:#b8c9c1;text-decoration:none;font-size:13px}.top a:hover{color:var(--cyan)}.badge{font-size:10px;border:1px solid #315047;padding:5px 8px;border-radius:99px;color:var(--cyan)}
+.wrap{max-width:1250px;margin:auto;padding:24px}.hero{padding:36px 0 24px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.12em}.hero h1{font-size:clamp(30px,5vw,58px);line-height:1.02;margin:10px 0}.hero p{max-width:800px;color:#a8b8b1;font-size:16px}
+.section{padding:30px 0}.sectionhead{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:15px}.section h2{font-size:25px;margin:5px 0}.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:linear-gradient(145deg,#10201b,#0b1512);border:1px solid var(--line);border-radius:15px;padding:16px}.k{font-size:10px;color:#8fa49a;text-transform:uppercase;letter-spacing:.08em}.v{font-size:25px;font-weight:850;margin-top:5px}.s{font-size:11px;color:#84958e;margin-top:3px}
+.panel{background:#0b1512;border:1px solid var(--line);border-radius:16px;padding:17px;margin-top:14px}.filters{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;padding:10px 9px;border-bottom:1px solid #1d2d27;font-size:12px}th{color:#8da198;font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.pill{padding:4px 7px;border-radius:99px;background:#18251f;color:#b9c8c1;font-size:10px}.good{color:var(--green)}.watch{color:var(--yellow)}.risk{color:var(--red)}
+.offline-map{background:#111d19;border:1px solid var(--line);border-radius:17px;overflow:hidden}.mapbar{padding:12px 14px;background:#0a1311;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}.mapactions{display:flex;gap:5px}.mapactions button{background:#16251f;color:#dce9e3;border:1px solid #2b4037;border-radius:7px;padding:5px 10px}.mapcanvas{height:570px;overflow:hidden;background:#13231f}.mapcanvas svg{width:100%;height:100%;display:block}.world{transform-origin:500px 325px;transition:.18s}.node{cursor:pointer}.node text{fill:#e7f1ec;font-size:11px;font-weight:bold;letter-spacing:.05em;paint-order:stroke;stroke:#10201b;stroke-width:5px}.ring{fill:#66dcd2;fill-opacity:.12;stroke:#66dcd2;stroke-width:2}.dot{fill:#70e5d9;stroke:#effffb;stroke-width:2}.node.watch .ring{stroke:var(--yellow)}.node.watch .dot{fill:var(--yellow)}.node.risk .ring{stroke:var(--red)}.node.risk .dot{fill:var(--red)}.node.selected .ring{stroke:#fff;stroke-width:4;fill:#fff3}.legend{padding:10px 14px;display:flex;flex-wrap:wrap;gap:15px;color:#91a29b;font-size:11px}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.l1{background:var(--cyan)}.l2{background:var(--yellow)}.l3{background:var(--red)}
+.two{display:grid;grid-template-columns:1.3fr .7fr;gap:14px}.selected{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.smallcard{padding:12px;background:#101e19;border-radius:11px;border:1px solid #20342c}.smallcard b{display:block;font-size:19px;margin-top:3px}
+.bar{height:8px;background:#1a2923;border-radius:9px;overflow:hidden}.bar span{display:block;height:100%;background:var(--cyan);border-radius:9px}.districtmap{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}.district{padding:9px 5px;background:#101e19;border:1px solid #20342c;border-radius:7px;text-align:center;font-size:10px;color:#b9c8c0}.district.high{border-color:#7a4646}.district.med{border-color:#79652e}
+footer{padding:30px 0;color:#71817a;font-size:11px;border-top:1px solid var(--line);margin-top:30px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.districtmap{grid-template-columns:repeat(4,1fr)}.top nav{display:none}}
+@media(max-width:560px){.wrap{padding:16px}.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.selected{grid-template-columns:repeat(2,1fr)}.mapcanvas{height:450px}}
+</style>
+</head>
+<body>
+
+<div class="login" id="login">
+ <div class="loginbox">
+  <div class="brand">GRIDTRACE <span>TN</span></div>
+  <h1>Distribution Intelligence</h1>
+  <p>Fully offline hackathon demonstration. No API keys or internet connection required.</p>
+  <label>Employee ID</label><input id="uid" value="DEMO-ADMIN" autocomplete="username">
+  <label>Password</label><input id="pwd" value="gridtrace" type="password" autocomplete="current-password">
+  <button class="primary" id="signin">Sign in</button>
+  <div class="err" id="loginerr"></div>
+  <p style="text-align:center;font-size:11px">Demo: <b>DEMO-ADMIN</b> / <b>gridtrace</b></p>
+ </div>
+</div>
+
+<div id="app" class="hidden">
+<header class="top">
+ <div class="brand">GRIDTRACE <span>TN</span></div>
+ <nav><a href="#state">State</a><a href="#map">Chennai map</a><a href="#power">Power cuts</a><a href="#loss">Loss</a><a href="#method">Method</a></nav>
+ <span class="badge">OFFLINE • SYNTHETIC DEMO</span>
+</header>
+
+<main class="wrap">
+<section class="hero">
+ <div class="eyebrow">TAMIL NADU DISTRIBUTION INTELLIGENCE</div>
+ <h1>See where energy disappears.<br>Trace the network behind it.</h1>
+ <p>GridTrace infers consumer-to-transformer relationships from existing utility signals, then connects outages, billing, voltage and energy accounting into one operational view.</p>
+</section>
+
+<section id="state" class="section">
+ <div class="sectionhead"><div><div class="eyebrow">STATE COMMAND CENTER</div><h2>Tamil Nadu overview</h2></div><span class="badge">38 DISTRICTS</span></div>
+ <div class="grid">
+  <div class="card"><div class="k">Unexplained loss</div><div class="v">8.1%</div><div class="s">Synthetic network estimate</div></div>
+  <div class="card"><div class="k">Monthly shutdown</div><div class="v">2.7 h</div><div class="s">Average monitored area</div></div>
+  <div class="card"><div class="k">Service availability</div><div class="v">96.4%</div><div class="s">Synthetic availability index</div></div>
+  <div class="card"><div class="k">Mapping confidence</div><div class="v">94.2%</div><div class="s">Consumer → transformer</div></div>
+ </div>
+ <div class="panel">
+  <div class="sectionhead"><div><h3>38-district network view</h3><span class="muted">Click a district to filter the table.</span></div><input id="districtSearch" placeholder="Search district..." style="max-width:260px"></div>
+  <div class="districtmap" id="districtGrid"></div>
+ </div>
+ <div class="panel tablewrap"><table><thead><tr><th>District</th><th>Unexplained loss</th><th>Shutdown</th><th>Availability</th><th>Signal</th></tr></thead><tbody id="districtTable"></tbody></table></div>
+</section>
+
+<section id="map" class="section">
+ <div class="sectionhead"><div><div class="eyebrow">CHENNAI NETWORK</div><h2>Offline area intelligence map</h2><p class="muted">This is a self-contained schematic map. It does not use Google Maps, tiles, APIs or external files.</p></div></div>
+ <div class="offline-map">
+  <div class="mapbar"><b>CHENNAI • GRIDTRACE DEMO NETWORK</b><div class="mapactions"><button id="zin">+</button><button id="zreset">Reset</button><button id="zout">−</button></div></div>
+  <div class="mapcanvas"><svg viewBox="0 0 1000 650" id="svg">
+   <defs><linearGradient id="terrain" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1d3029"/><stop offset=".55" stop-color="#263a31"/><stop offset="1" stop-color="#15231f"/></linearGradient></defs>
+   <g class="world" id="world">
+    <rect width="1000" height="650" fill="url(#terrain)"/>
+    <path d="M800 0C770 90 825 150 800 230C775 315 840 380 805 460C780 535 830 600 800 650H1000V0Z" fill="#10303b"/>
+    <path d="M800 0C770 90 825 150 800 230C775 315 840 380 805 460C780 535 830 600 800 650" fill="none" stroke="#528a91" stroke-width="4"/>
+    <g fill="none" stroke="#51655b" stroke-width="2" opacity=".5"><path d="M80 100L730 140 760 250 90 210Z"/><path d="M70 220L730 255 760 365 85 335Z"/><path d="M80 350L730 370 765 505 110 475Z"/><path d="M150 480L740 510 760 590 190 570Z"/><path d="M180 50L160 580"/><path d="M340 50L330 590"/><path d="M500 60L510 600"/><path d="M650 80L670 600"/></g>
+    <g fill="none" stroke="#8b9b8e" stroke-width="7" opacity=".65"><path d="M120 520C250 430 290 350 390 275C470 215 590 185 760 150"/><path d="M160 120C300 190 420 250 530 335C610 395 690 455 785 520"/><path d="M105 355C260 350 400 350 545 365C650 375 710 395 785 420"/></g>
+    <g fill="none" stroke="#55c7c0" stroke-width="2" stroke-dasharray="8 7" opacity=".7"><path d="M300 260L440 330 570 240 690 330"/><path d="M440 330L510 430 650 390"/><path d="M510 430L610 520 730 470"/></g>
+    <g id="nodes"></g>
+    <text x="850" y="600" fill="#a5bbb3" font-size="13">BAY OF BENGAL</text><text x="35" y="40" fill="#c1d0ca" font-size="14" font-weight="700">CHENNAI • OFFLINE GRIDTRACE</text>
+   </g>
+  </svg></div>
+  <div class="legend"><span><i class="l1"></i>Normal</span><span><i class="l2"></i>Power-cut/reliability watch</span><span><i class="l3"></i>Loss/voltage watch</span><span>Click an area</span></div>
+ </div>
+
+ <div class="panel">
+  <div class="sectionhead"><div><div class="eyebrow">SELECTED AREA</div><h2 id="selName">Anna Nagar</h2></div><span id="selStatus" class="pill good">NORMAL</span></div>
+  <div class="selected">
+   <div class="smallcard"><span class="k">Input energy</span><b id="si">1.91 GWh</b></div>
+   <div class="smallcard"><span class="k">Billed energy</span><b id="sb">1.78 GWh</b></div>
+   <div class="smallcard"><span class="k">Unexplained loss</span><b id="sl">6.8%</b></div>
+   <div class="smallcard"><span class="k">Consumers</span><b id="sc">1,360</b></div>
+   <div class="smallcard"><span class="k">Monthly shutdown</span><b id="ss">2.1 h</b></div>
+   <div class="smallcard"><span class="k">Voltage fluctuation</span><b id="sv">±4.5%</b></div>
+   <div class="smallcard"><span class="k">Mapping confidence</span><b id="sf">97%</b></div>
+   <div class="smallcard"><span class="k">Network signal</span><b id="sig">Stable</b></div>
+  </div>
+ </div>
+</section>
+
+<section id="power" class="section">
+ <div class="sectionhead"><div><div class="eyebrow">POWER CUTS</div><h2>Shutdown & outage command view</h2><p class="muted">Synthetic demonstration events.</p></div></div>
+ <div class="grid">
+  <div class="card"><div class="k">Open / active cuts</div><div class="v">3</div><div class="s">Areas requiring attention</div></div>
+  <div class="card"><div class="k">Consumers affected</div><div class="v">8,420</div><div class="s">Open + scheduled events</div></div>
+  <div class="card"><div class="k">Scheduled cuts</div><div class="v">5</div><div class="s">Planned maintenance</div></div>
+  <div class="card"><div class="k">Avg restoration</div><div class="v">74 min</div><div class="s">Synthetic benchmark</div></div>
+ </div>
+ <div class="panel tablewrap"><table><thead><tr><th>Area</th><th>Start</th><th>Duration</th><th>Affected</th><th>Type</th><th>Cause</th><th>Status</th></tr></thead><tbody>
+ <tr><td>Adyar</td><td>18:20</td><td>1h 15m</td><td>1,840</td><td>Unplanned</td><td>Feeder fault</td><td class="good">Restored</td></tr>
+ <tr><td>Velachery</td><td>19:05</td><td>2h 10m</td><td>2,310</td><td>Maintenance</td><td>Feeder work</td><td class="risk">Open</td></tr>
+ <tr><td>Ambattur</td><td>16:40</td><td>48m</td><td>1,120</td><td>Unplanned</td><td>Transformer trip</td><td class="good">Restored</td></tr>
+ <tr><td>T. Nagar</td><td>21:15</td><td>1h 35m</td><td>980</td><td>Scheduled</td><td>Cable work</td><td class="watch">Scheduled</td></tr>
+ <tr><td>Anna Nagar</td><td>14:30</td><td>32m</td><td>760</td><td>Unplanned</td><td>Protection trip</td><td class="good">Restored</td></tr>
+ <tr><td>Guindy</td><td>11:10</td><td>1h 50m</td><td>1,410</td><td>Maintenance</td><td>Substation work</td><td class="risk">Open</td></tr>
+ </tbody></table></div>
+</section>
+
+<section id="loss" class="section">
+ <div class="sectionhead"><div><div class="eyebrow">LOSS INTELLIGENCE</div><h2>Transformer energy accounting</h2></div></div>
+ <div class="panel tablewrap"><table><thead><tr><th>Transformer</th><th>Area</th><th>Input</th><th>Billed</th><th>Unexplained loss</th><th>Consumers</th><th>Shutdown</th><th>Mapping confidence</th></tr></thead><tbody>
+ <tr><td>ADY-TR-014</td><td>Adyar</td><td>1.82 GWh</td><td>1.69 GWh</td><td class="watch">7.1%</td><td>1,240</td><td>1.8 h</td><td>97%</td></tr>
+ <tr><td>VEL-TR-022</td><td>Velachery</td><td>2.14 GWh</td><td>1.91 GWh</td><td class="risk">10.7%</td><td>1,580</td><td>4.8 h</td><td>92%</td></tr>
+ <tr><td>AMB-TR-031</td><td>Ambattur</td><td>1.67 GWh</td><td>1.55 GWh</td><td class="watch">7.2%</td><td>1,090</td><td>3.2 h</td><td>95%</td></tr>
+ <tr><td>TNG-TR-009</td><td>T. Nagar</td><td>2.03 GWh</td><td>1.88 GWh</td><td class="watch">7.4%</td><td>1,420</td><td>2.7 h</td><td>96%</td></tr>
+ <tr><td>ANN-TR-017</td><td>Anna Nagar</td><td>1.91 GWh</td><td>1.78 GWh</td><td>6.8%</td><td>1,360</td><td>2.1 h</td><td>98%</td></tr>
+ <tr><td>GUI-TR-026</td><td>Guindy</td><td>2.31 GWh</td><td>2.08 GWh</td><td class="risk">10.0%</td><td>1,510</td><td>4.1 h</td><td>91%</td></tr>
+ </tbody></table></div>
+</section>
+
+<section id="method" class="section">
+ <div class="sectionhead"><div><div class="eyebrow">R&D METHOD</div><h2>How GridTrace works</h2></div></div>
+ <div class="grid">
+  <div class="card"><div class="k">01 · Detect</div><div class="s">Match synchronized outages and restoration patterns across consumer data.</div></div>
+  <div class="card"><div class="k">02 · Map</div><div class="s">Infer consumer → transformer relationships using correlation, geography and billing behavior.</div></div>
+  <div class="card"><div class="k">03 · Quantify</div><div class="s">Compare transformer input energy with billed energy and outage behavior.</div></div>
+  <div class="card"><div class="k">04 · Explain</div><div class="s">Separate likely technical loss, metering signals and commercial-risk indicators for investigation.</div></div>
+ </div>
+ <div class="panel"><h3>Demo disclaimer</h3><p class="muted">All figures, outage events, transformer values and district metrics in this prototype are synthetic demonstration data. They are not live TANGEDCO/TNPDCL operational figures and should not be treated as official utility records.</p></div>
+</section>
+<footer>GridTrace TN • Offline hackathon prototype • No external APIs, map tiles, CDNs or network calls.</footer>
+</main>
+</div>
+
+<script>
+const DISTRICTS = [{"name": "Ariyalur", "loss": 7.2, "shutdown": 2.1, "availability": 96.8}, {"name": "Chengalpattu", "loss": 8.4, "shutdown": 2.8, "availability": 96.1}, {"name": "Chennai", "loss": 9.1, "shutdown": 3.4, "availability": 95.4}, {"name": "Coimbatore", "loss": 7.8, "shutdown": 2.4, "availability": 97.1}, {"name": "Cuddalore", "loss": 8.7, "shutdown": 3.0, "availability": 95.8}, {"name": "Dharmapuri", "loss": 7.5, "shutdown": 2.6, "availability": 96.4}, {"name": "Dindigul", "loss": 8.1, "shutdown": 2.7, "availability": 96.0}, {"name": "Erode", "loss": 7.4, "shutdown": 2.2, "availability": 97.0}, {"name": "Kallakurichi", "loss": 8.0, "shutdown": 2.5, "availability": 96.3}, {"name": "Kancheepuram", "loss": 8.6, "shutdown": 2.9, "availability": 95.9}, {"name": "Karur", "loss": 7.1, "shutdown": 2.0, "availability": 97.2}, {"name": "Krishnagiri", "loss": 7.9, "shutdown": 2.5, "availability": 96.5}, {"name": "Madurai", "loss": 8.5, "shutdown": 2.9, "availability": 95.7}, {"name": "Mayiladuthurai", "loss": 8.2, "shutdown": 2.8, "availability": 96.1}, {"name": "Nagapattinam", "loss": 9.0, "shutdown": 3.2, "availability": 95.2}, {"name": "Kanniyakumari", "loss": 7.0, "shutdown": 1.9, "availability": 97.4}, {"name": "Namakkal", "loss": 7.3, "shutdown": 2.2, "availability": 97.0}, {"name": "Perambalur", "loss": 7.6, "shutdown": 2.4, "availability": 96.6}, {"name": "Pudukkottai", "loss": 8.3, "shutdown": 2.7, "availability": 96.0}, {"name": "Ramanathapuram", "loss": 8.9, "shutdown": 3.1, "availability": 95.5}, {"name": "Ranipet", "loss": 8.0, "shutdown": 2.6, "availability": 96.3}, {"name": "Salem", "loss": 7.7, "shutdown": 2.4, "availability": 96.8}, {"name": "Sivaganga", "loss": 8.1, "shutdown": 2.6, "availability": 96.2}, {"name": "Tenkasi", "loss": 7.8, "shutdown": 2.5, "availability": 96.5}, {"name": "Thanjavur", "loss": 8.4, "shutdown": 2.8, "availability": 96.0}, {"name": "Theni", "loss": 7.2, "shutdown": 2.1, "availability": 97.1}, {"name": "Thoothukudi", "loss": 8.8, "shutdown": 3.0, "availability": 95.6}, {"name": "Tiruchirappalli", "loss": 8.0, "shutdown": 2.6, "availability": 96.4}, {"name": "Tirunelveli", "loss": 8.3, "shutdown": 2.7, "availability": 96.0}, {"name": "Tirupathur", "loss": 7.9, "shutdown": 2.5, "availability": 96.5}, {"name": "Tiruppur", "loss": 7.6, "shutdown": 2.3, "availability": 96.9}, {"name": "Tiruvallur", "loss": 8.9, "shutdown": 3.1, "availability": 95.6}, {"name": "Tiruvarur", "loss": 8.5, "shutdown": 2.9, "availability": 95.8}, {"name": "Tiruvannamalai", "loss": 8.0, "shutdown": 2.6, "availability": 96.3}, {"name": "The Nilgiris", "loss": 6.8, "shutdown": 1.8, "availability": 97.6}, {"name": "Vellore", "loss": 8.1, "shutdown": 2.6, "availability": 96.4}, {"name": "Viluppuram", "loss": 8.3, "shutdown": 2.7, "availability": 96.1}, {"name": "Virudhunagar", "loss": 8.2, "shutdown": 2.6, "availability": 96.2}];
+const AREAS = [{"name": "Anna Nagar", "status": "normal", "loss": 6.8, "shutdown": 2.1, "consumers": 1360, "voltage": 4.5, "input": 1.91, "billed": 1.78, "confidence": 97}, {"name": "T. Nagar", "status": "watch", "loss": 7.4, "shutdown": 2.7, "consumers": 1420, "voltage": 4.9, "input": 2.03, "billed": 1.88, "confidence": 96}, {"name": "Adyar", "status": "risk", "loss": 7.1, "shutdown": 3.6, "consumers": 1240, "voltage": 5.8, "input": 1.82, "billed": 1.69, "confidence": 97}, {"name": "Velachery", "status": "risk", "loss": 10.7, "shutdown": 4.8, "consumers": 1580, "voltage": 7.2, "input": 2.14, "billed": 1.91, "confidence": 92}, {"name": "Tambaram", "status": "normal", "loss": 6.2, "shutdown": 2.4, "consumers": 1110, "voltage": 4.3, "input": 1.56, "billed": 1.46, "confidence": 95}, {"name": "Ambattur", "status": "watch", "loss": 7.2, "shutdown": 3.2, "consumers": 1090, "voltage": 5.1, "input": 1.67, "billed": 1.55, "confidence": 95}, {"name": "Guindy", "status": "risk", "loss": 10.0, "shutdown": 4.1, "consumers": 1510, "voltage": 6.4, "input": 2.31, "billed": 2.08, "confidence": 91}, {"name": "Perambur", "status": "normal", "loss": 6.5, "shutdown": 2.0, "consumers": 980, "voltage": 4.1, "input": 1.42, "billed": 1.33, "confidence": 96}, {"name": "Royapuram", "status": "watch", "loss": 8.1, "shutdown": 3.0, "consumers": 1170, "voltage": 5.5, "input": 1.73, "billed": 1.59, "confidence": 94}];
+
+const $=id=>document.getElementById(id);
+function login(){
+  if($("uid").value.trim()==="DEMO-ADMIN" && $("pwd").value==="gridtrace"){
+    $("login").classList.add("hidden"); $("app").classList.remove("hidden");
+    sessionStorage.setItem("gridtraceOK","1");
+  }else $("loginerr").textContent="Incorrect credentials. Use DEMO-ADMIN / gridtrace.";
+}
+$("signin").onclick=login;
+["uid","pwd"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")login()}));
+if(sessionStorage.getItem("gridtraceOK")==="1"){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
+
+function renderDistricts(q=""){
+  const f=DISTRICTS.filter(d=>d.name.toLowerCase().includes(q.toLowerCase()));
+  $("districtGrid").innerHTML=f.map(d=>`<button class="district ${d.loss>=8.5?"high":d.loss>=8?"med":""}" onclick="filterDistrict('${d.name}')">${d.name}</button>`).join("");
+  $("districtTable").innerHTML=f.map(d=>`<tr><td>${d.name}</td><td>${d.loss.toFixed(1)}%</td><td>${d.shutdown.toFixed(1)} h</td><td>${d.availability.toFixed(1)}%</td><td class="${d.loss>=8.5?"risk":d.loss>=8?"watch":"good"}">${d.loss>=8.5?"Investigate":d.loss>=8?"Watch":"Stable"}</td></tr>`).join("");
+}
+function filterDistrict(n){$("districtSearch").value=n;renderDistricts(n)}
+$("districtSearch").oninput=e=>renderDistricts(e.target.value);
+
+const coords={
+"Anna Nagar":[360,210],"T. Nagar":[440,330],"Adyar":[610,430],"Velachery":[510,500],
+"Tambaram":[300,535],"Ambattur":[190,270],"Guindy":[400,390],"Perambur":[350,135],"Royapuram":[565,110]
+};
+function drawNodes(){
+ const ns="http://www.w3.org/2000/svg";
+ $("nodes").innerHTML="";
+ AREAS.forEach(a=>{
+   const g=document.createElementNS(ns,"g");g.setAttribute("class","node "+a.status);g.dataset.name=a.name;
+   g.setAttribute("transform",`translate(${coords[a.name][0]} ${coords[a.name][1]})`);
+   g.innerHTML=`<circle class="ring" r="22"/><circle class="dot" r="9"/><text y="${coords[a.name][1]>470?42:-30}" text-anchor="middle">${a.name.toUpperCase()}</text>`;
+   g.onclick=()=>selectArea(a.name); $("nodes").appendChild(g);
+ });
+}
+function selectArea(name){
+ const a=AREAS.find(x=>x.name===name);if(!a)return;
+ document.querySelectorAll(".node").forEach(n=>n.classList.toggle("selected",n.dataset.name===name));
+ $("selName").textContent=a.name;$("si").textContent=a.input.toFixed(2)+" GWh";$("sb").textContent=a.billed.toFixed(2)+" GWh";
+ $("sl").textContent=a.loss.toFixed(1)+"%";$("sc").textContent=a.consumers.toLocaleString();$("ss").textContent=a.shutdown.toFixed(1)+" h";
+ $("sv").textContent="±"+a.voltage.toFixed(1)+"%";$("sf").textContent=a.confidence+"%";
+ $("sig").textContent=a.status==="risk"?"Investigate":a.status==="watch"?"Watch":"Stable";
+ $("selStatus").textContent=a.status.toUpperCase();$("selStatus").className="pill "+(a.status==="risk"?"risk":a.status==="watch"?"watch":"good");
+}
+let scale=1;function applyZoom(){$("world").style.transform=`scale(${scale})`}
+$("zin").onclick=()=>{scale=Math.min(2.2,scale+.2);applyZoom()};$("zout").onclick=()=>{scale=Math.max(.8,scale-.2);applyZoom()};$("zreset").onclick=()=>{scale=1;applyZoom()};
+renderDistricts();drawNodes();selectArea("Anna Nagar");
+</script>
+</body>
+</html>
